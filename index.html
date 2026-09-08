@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz</title>
+<style>
+  :root{
+    --bg: #f6f4ef;
+    --ink: #22281f;
+    --accent: #3f6b4a;
+    --accent-soft: #dfe9de;
+    --wrong: #b3492f;
+    --wrong-soft: #f4ddd6;
+    --card: #ffffff;
+    --border: #dedbd0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px 16px;
+  }
+  .wrap{
+    width:100%;
+    max-width: 460px;
+  }
+  .progress{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom: 22px;
+  }
+  .progress-track{
+    flex:1;
+    height:4px;
+    background:var(--border);
+    border-radius: 2px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--accent);
+    width:0%;
+    transition: width .35s ease;
+  }
+  .progress-label{
+    font-size:13px;
+    color:#6b6a60;
+    white-space:nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding: 28px 24px;
+    transition: transform .2s ease;
+  }
+  .question{
+    font-size: 19px;
+    line-height:1.4;
+    margin: 0 0 22px 0;
+    font-weight:600;
+  }
+  .answers{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  button.answer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    text-align:left;
+    padding: 14px 16px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#fff;
+    color:var(--ink);
+    font-size:15px;
+    cursor:pointer;
+    transition: border-color .15s ease, background .15s ease, transform .1s ease;
+    font-family:inherit;
+  }
+  button.answer:active{ transform: scale(0.99); }
+  button.answer:hover:not(:disabled){ border-color:#b9b6a8; }
+  button.answer:disabled{ cursor:default; }
+  .mark{
+    font-size:15px;
+    opacity:0;
+    transform: scale(0.5);
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .mark.show{ opacity:1; transform: scale(1); }
+  button.answer.correct{
+    background:var(--accent-soft);
+    border-color:var(--accent);
+    animation: pulseCorrect .4s ease;
+  }
+  button.answer.wrong{
+    background:var(--wrong-soft);
+    border-color:var(--wrong);
+    animation: shakeWrong .4s ease;
+  }
+  @keyframes pulseCorrect{
+    0%{ transform:scale(1); }
+    50%{ transform:scale(1.03); }
+    100%{ transform:scale(1); }
+  }
+  @keyframes shakeWrong{
+    0%,100%{ transform:translateX(0); }
+    20%{ transform:translateX(-6px); }
+    40%{ transform:translateX(6px); }
+    60%{ transform:translateX(-4px); }
+    80%{ transform:translateX(4px); }
+  }
+  .feedback{
+    min-height: 20px;
+    margin-top: 14px;
+    font-size: 14px;
+  }
+  .feedback.wrong-text{ color:var(--wrong); }
+  .feedback.correct-text{ color:var(--accent); }
+  .footer{
+    margin-top:16px;
+    text-align:center;
+    font-size:12px;
+    color:#8c8a7d;
+  }
+  .done{
+    text-align:center;
+    padding: 40px 24px;
+  }
+  .done h1{
+    font-size:22px;
+    margin-bottom:8px;
+  }
+  .done p{
+    color:#6b6a60;
+    font-size:14px;
+  }
+  .restart{
+    margin-top:20px;
+    padding:12px 20px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#fff;
+    cursor:pointer;
+    font-size:14px;
+    font-family:inherit;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="progress">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">1 / 19</div>
+  </div>
+  <div class="card" id="card"></div>
+  <div class="footer">Selecciona la respuesta correcta para avanzar</div>
+</div>
+
+<script>
+const questions = [
+  { q: "¿Cuál es la capital de Portugal?", a: ["Oporto", "Lisboa", "Coímbra"], correct: 1 },
+  { q: "¿Cuántos continentes hay en la Tierra?", a: ["5", "6", "7"], correct: 2 },
+  { q: "¿Qué gas respiramos principalmente para vivir?", a: ["Oxígeno", "Nitrógeno"], correct: 0 },
+  { q: "¿En qué año llegó el hombre a la Luna?", a: ["1965", "1969", "1972"], correct: 1 },
+  { q: "¿Cuál es el océano más grande del mundo?", a: ["Atlántico", "Índico", "Pacífico"], correct: 2 },
+  { q: "¿Quién pintó 'La Gioconda'?", a: ["Miguel Ángel", "Leonardo da Vinci", "Rafael"], correct: 1 },
+  { q: "¿Cuántos lados tiene un hexágono?", a: ["5", "6", "8"], correct: 1 },
+  { q: "¿Cuál es el río más largo del mundo?", a: ["Nilo", "Amazonas"], correct: 1 },
+  { q: "¿Qué planeta es conocido como el planeta rojo?", a: ["Venus", "Marte", "Júpiter"], correct: 1 },
+  { q: "¿En qué idioma se originó la palabra 'plaza'?", a: ["Griego", "Latín", "Árabe"], correct: 1 },
+  { q: "¿Cuántos huesos tiene el cuerpo humano adulto aproximadamente?", a: ["206", "150", "300"], correct: 0 },
+  { q: "¿Qué elemento químico tiene el símbolo 'Fe'?", a: ["Flúor", "Hierro", "Francio"], correct: 1 },
+  { q: "¿Cuál es el animal terrestre más rápido?", a: ["León", "Guepardo", "Caballo"], correct: 1 },
+  { q: "¿Qué mar separa Europa de África en su punto más cercano?", a: ["Mar Rojo", "Estrecho de Gibraltar", "Mar Negro"], correct: 1 },
+  { q: "¿Cuántas cuerdas tiene una guitarra clásica?", a: ["4", "6", "8"], correct: 1 },
+  { q: "¿Cuál es el metal más abundante en la corteza terrestre?", a: ["Hierro", "Aluminio", "Cobre"], correct: 1 },
+  { q: "¿Qué país tiene forma de bota?", a: ["Grecia", "Italia", "España"], correct: 1 },
+  { q: "¿Cuál es la moneda oficial de Japón?", a: ["Yuan", "Won", "Yen"], correct: 2 },
+  { q: "¿Cuántos minutos tiene una hora?", a: ["50", "60"], correct: 1 }
+];
+
+let current = 0;
+let locked = false;
+const card = document.getElementById("card");
+const progressFill = document.getElementById("progressFill");
+const progressLabel = document.getElementById("progressLabel");
+
+function render() {
+  locked = false;
+  if (current >= questions.length) {
+    renderDone();
+    return;
+  }
+  const item = questions[current];
+  progressFill.style.width = ((current) / questions.length * 100) + "%";
+  progressLabel.textContent = (current + 1) + " / " + questions.length;
+
+  card.innerHTML = "";
+  const qEl = document.createElement("p");
+  qEl.className = "question";
+  qEl.textContent = item.q;
+  card.appendChild(qEl);
+
+  const answersEl = document.createElement("div");
+  answersEl.className = "answers";
+
+  const feedback = document.createElement("div");
+  feedback.className = "feedback";
+
+  item.a.forEach((text, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "answer";
+    const label = document.createElement("span");
+    label.textContent = text;
+    const mark = document.createElement("span");
+    mark.className = "mark";
+    btn.appendChild(label);
+    btn.appendChild(mark);
+    btn.addEventListener("click", () => handleAnswer(idx, btn, mark, answersEl, feedback));
+    answersEl.appendChild(btn);
+  });
+
+  card.appendChild(answersEl);
+  card.appendChild(feedback);
+}
+
+function handleAnswer(idx, btn, mark, answersEl, feedback) {
+  if (locked) return;
+  locked = true;
+  const item = questions[current];
+  Array.from(answersEl.children).forEach(b => b.disabled = true);
+
+  if (idx === item.correct) {
+    btn.classList.add("correct");
+    mark.textContent = "✓";
+    mark.classList.add("show");
+    feedback.textContent = "Correcto.";
+    feedback.className = "feedback correct-text";
+    setTimeout(() => {
+      current++;
+      render();
+    }, 550);
+  } else {
+    btn.classList.add("wrong");
+    mark.textContent = "✗";
+    mark.classList.add("show");
+    feedback.textContent = "Incorrecto. Vuelves a empezar desde la pregunta 1.";
+    feedback.className = "feedback wrong-text";
+    setTimeout(() => {
+      current = 0;
+      render();
+    }, 900);
+  }
+}
+
+function renderDone() {
+  progressFill.style.width = "100%";
+  progressLabel.textContent = questions.length + " / " + questions.length;
+  card.innerHTML = "";
+  const done = document.createElement("div");
+  done.className = "done";
+  done.innerHTML = `
+    <h1>Completado</h1>
+    <p>Has respondido correctamente las ${questions.length} preguntas.</p>
+    <button class="restart" id="restartBtn">Volver a empezar</button>
+  `;
+  card.appendChild(done);
+  document.getElementById("restartBtn").addEventListener("click", () => {
+    current = 0;
+    render();
+  });
+}
+
+render();
+</script>
+</body>
+</html>
