@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Quiz</title>
 <style>
   :root{
@@ -16,16 +16,19 @@
     --border: #dedbd0;
   }
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
+  html,body{margin:0;padding:0;height:100%;}
   body{
     background:var(--bg);
     color:var(--ink);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    min-height:100vh;
+    min-height:100dvh;
     display:flex;
     align-items:center;
     justify-content:center;
-    padding: 24px 16px;
+    padding: clamp(10px, 2.5dvh, 24px) 16px;
+    padding-top: max(clamp(10px, 2.5dvh, 24px), env(safe-area-inset-top));
+    padding-bottom: max(clamp(10px, 2.5dvh, 24px), env(safe-area-inset-bottom));
+    overflow-x:hidden;
   }
   .wrap{
     width:100%;
@@ -35,7 +38,7 @@
     display:flex;
     align-items:center;
     gap:10px;
-    margin-bottom: 22px;
+    margin-bottom: clamp(10px, 2dvh, 22px);
   }
   .progress-track{
     flex:1;
@@ -51,17 +54,18 @@
     transition: width .35s ease;
   }
   .progress-label{
-    font-size:13px;
+    font-size:12px;
     color:#6b6a60;
     white-space:nowrap;
     font-variant-numeric: tabular-nums;
   }
   .image-frame{
     width:100%;
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 16 / 9;
+    max-height: 30dvh;
     border-radius:14px;
     overflow:hidden;
-    margin-bottom:20px;
+    margin-bottom: clamp(10px, 2dvh, 20px);
     background:#e7e4d9;
   }
   .image-frame img{
@@ -74,19 +78,19 @@
     background:var(--card);
     border:1px solid var(--border);
     border-radius:14px;
-    padding: 28px 24px;
+    padding: clamp(16px, 3dvh, 28px) clamp(16px, 4vw, 24px);
     transition: transform .2s ease;
   }
   .question{
-    font-size: 19px;
-    line-height:1.4;
-    margin: 0 0 22px 0;
+    font-size: clamp(16px, 4vw, 19px);
+    line-height:1.35;
+    margin: 0 0 clamp(12px, 2dvh, 22px) 0;
     font-weight:600;
   }
   .answers{
     display:flex;
     flex-direction:column;
-    gap:10px;
+    gap: clamp(7px, 1.2dvh, 10px);
   }
   button.answer{
     display:flex;
@@ -94,12 +98,12 @@
     justify-content:space-between;
     gap:10px;
     text-align:left;
-    padding: 14px 16px;
+    padding: clamp(10px, 1.8dvh, 14px) 14px;
     border-radius:10px;
     border:1px solid var(--border);
     background:#fff;
     color:var(--ink);
-    font-size:15px;
+    font-size: clamp(13px, 3.6vw, 15px);
     cursor:pointer;
     transition: border-color .15s ease, background .15s ease, transform .1s ease;
     font-family:inherit;
@@ -108,10 +112,11 @@
   button.answer:hover:not(:disabled){ border-color:#b9b6a8; }
   button.answer:disabled{ cursor:default; }
   .mark{
-    font-size:15px;
+    font-size:14px;
     opacity:0;
     transform: scale(0.5);
     transition: opacity .2s ease, transform .2s ease;
+    flex-shrink:0;
   }
   .mark.show{ opacity:1; transform: scale(1); }
   button.answer.correct{
@@ -137,32 +142,32 @@
     80%{ transform:translateX(4px); }
   }
   .feedback{
-    min-height: 20px;
-    margin-top: 14px;
-    font-size: 14px;
+    min-height: 16px;
+    margin-top: clamp(8px, 1.5dvh, 14px);
+    font-size: 13px;
   }
   .feedback.wrong-text{ color:var(--wrong); }
   .feedback.correct-text{ color:var(--accent); }
   .footer{
-    margin-top:16px;
+    margin-top: clamp(8px, 1.5dvh, 16px);
     text-align:center;
-    font-size:12px;
+    font-size:11px;
     color:#8c8a7d;
   }
   .done{
     text-align:center;
-    padding: 40px 24px;
+    padding: clamp(20px, 4dvh, 40px) 20px;
   }
   .done h1{
-    font-size:22px;
+    font-size:20px;
     margin-bottom:8px;
   }
   .done p{
     color:#6b6a60;
-    font-size:14px;
+    font-size:13px;
   }
   .restart{
-    margin-top:20px;
+    margin-top:16px;
     padding:12px 20px;
     border-radius:10px;
     border:1px solid var(--border);
@@ -173,25 +178,26 @@
   }
   .welcome{
     text-align:center;
-    padding: 44px 24px;
+    padding: clamp(20px, 4dvh, 44px) 20px;
   }
   .welcome h1{
-    font-size:24px;
+    font-size: clamp(18px, 5vw, 24px);
     margin: 0 0 10px 0;
   }
   .welcome p{
     color:#6b6a60;
-    font-size:14px;
-    margin:0 0 26px 0;
+    font-size:13px;
+    margin:0 0 20px 0;
     white-space:pre-line;
+    line-height:1.45;
   }
   .start-btn{
-    padding:14px 34px;
+    padding:13px 30px;
     border-radius:10px;
     border:none;
     background:var(--accent);
     color:#fff;
-    font-size:16px;
+    font-size:15px;
     font-weight:600;
     cursor:pointer;
     font-family:inherit;
@@ -200,26 +206,27 @@
   .start-btn:active{ transform: scale(0.97); }
   .final-screen{
     text-align:center;
-    padding: 30px 24px;
+    padding: clamp(16px, 3dvh, 30px) 20px;
   }
   .final-screen h1{
-    font-size:22px;
+    font-size:20px;
     margin: 0 0 10px 0;
   }
   .final-screen p{
     color:#6b6a60;
-    font-size:14px;
+    font-size:13px;
     margin:0;
+    line-height:1.4;
   }
   .loading-dots{
     display:flex;
     justify-content:center;
     gap:6px;
-    margin-top:14px;
+    margin-top:12px;
   }
   .loading-dots span{
-    width:7px;
-    height:7px;
+    width:6px;
+    height:6px;
     border-radius:50%;
     background: var(--accent);
     opacity:0.4;
@@ -235,10 +242,10 @@
     display:flex;
     flex-direction:column;
     align-items:center;
-    margin-top:14px;
+    margin-top:12px;
   }
   .spin-emoji{
-    font-size:24px;
+    font-size:22px;
     display:inline-block;
     animation: spinEmoji 1.1s linear infinite;
   }
@@ -295,8 +302,8 @@ const FINAL_NO_IMAGE = "images/no.jpg";
 const FINAL_NO_TITLE = "No";                                                      // <-- título en negrita de la pantalla "No"
 const FINAL_NO_TEXT = "NOS VAMOS A TABARCA (estaba pendiente) Te quiero 🦆🌻";      // <-- texto de la pantalla "No" (respuesta correcta)
 const FINAL_SI_IMAGE = "images/si.jpg";
-const FINAL_SI_TITLE = "Mi última maldad 😈 ";                                                      // <-- título en negrita de la pantalla "Sí"
-const FINAL_SI_TEXT = " Venga que ya sabes donde vamos pero tienes que ver el final 🦭 ";          // <-- texto de la pantalla "Sí" (respuesta incorrecta)
+const FINAL_SI_TITLE = "Mi última maldad 😈 ";                                     // <-- título en negrita de la pantalla "Sí"
+const FINAL_SI_TEXT = " Venga que ya sabes donde vamos pero tienes que ver el final 🦭 ";  // <-- texto de la pantalla "Sí" (respuesta incorrecta)
 
 // Emoji que gira mientras se espera para pasar de pregunta / pantalla.
 // Uno distinto por cada una de las 19 preguntas (en el mismo orden que el array "questions").
