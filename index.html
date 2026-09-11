@@ -183,6 +183,7 @@
     color:#6b6a60;
     font-size:14px;
     margin:0 0 26px 0;
+    white-space:pre-line;
   }
   .start-btn{
     padding:14px 34px;
@@ -197,6 +198,19 @@
     transition: transform .1s ease, opacity .15s ease;
   }
   .start-btn:active{ transform: scale(0.97); }
+  .final-screen{
+    text-align:center;
+    padding: 30px 24px;
+  }
+  .final-screen h1{
+    font-size:22px;
+    margin: 0 0 10px 0;
+  }
+  .final-screen p{
+    color:#6b6a60;
+    font-size:14px;
+    margin:0;
+  }
 </style>
 </head>
 <body>
@@ -233,6 +247,16 @@ const questions = [
   { q: "¿Te suena esto?", a: ["Sí", "No"], correct: 1, img: "images/20.jpg" }
 ];
 
+// Tiempo (en milisegundos) que se espera tras responder antes de continuar.
+const DECISION_DELAY = 5000;
+
+// Imágenes y textos de las pantallas finales de la última pregunta.
+// EDITA AQUI los textos de cada pantalla final:
+const FINAL_NO_IMAGE = "images/no.jpg";
+const FINAL_NO_TEXT = "TEXTO_FINAL_NO_AQUI";      // <-- texto de la pantalla "No" (respuesta correcta)
+const FINAL_SI_IMAGE = "images/si.jpg";
+const FINAL_SI_TEXT = "TEXTO_FINAL_SI_AQUI";      // <-- texto de la pantalla "Sí" (respuesta incorrecta)
+
 let current = 0;
 let locked = false;
 let started = false;
@@ -256,10 +280,9 @@ function renderWelcome() {
   welcome.className = "welcome";
   welcome.innerHTML = `
     <h1>🎉¡MUCHAS FELICIDADES MI AMORRRR!❤️</h1>
-    <p>Juega y diviertete con el cuestionario 😈  
-    Si fallas vuelves a empezar, piensa bien tus respuestas 👾
-    Al completarlo se desvelará el destino 🎆
-    </p>
+    <p>Juega y diviertete con el cuestionario 😈
+Si fallas vuelves a empezar, piensa bien tus respuestas 👾
+Al completarlo se desvelará el destino 🎆</p>
     <button class="start-btn" id="startBtn">Comenzar</button>
   `;
   card.appendChild(welcome);
@@ -324,29 +347,67 @@ function handleAnswer(idx, btn, mark, answersEl, feedback) {
   if (locked) return;
   locked = true;
   const item = questions[current];
+  const isLastQuestion = current === questions.length - 1;
   Array.from(answersEl.children).forEach(b => b.disabled = true);
 
   if (idx === item.correct) {
     btn.classList.add("correct");
     mark.textContent = "✓";
     mark.classList.add("show");
+
+    if (isLastQuestion) {
+      // Respuesta "No" (correcta) -> pantalla final definitiva, sin botón.
+      setTimeout(() => {
+        renderFinalScreen(FINAL_NO_IMAGE, "No", FINAL_NO_TEXT);
+      }, 600);
+      return;
+    }
+
     feedback.textContent = "Mu bien mu bien, pa'la siguiente 😚.";
     feedback.className = "feedback correct-text";
     setTimeout(() => {
       current++;
       render();
-    }, 550);
+    }, DECISION_DELAY);
   } else {
     btn.classList.add("wrong");
     mark.textContent = "✗";
     mark.classList.add("show");
+
+    if (isLastQuestion) {
+      // Respuesta "Sí" (incorrecta) -> se muestra su pantalla 5s y luego reinicia.
+      renderFinalScreen(FINAL_SI_IMAGE, "Sí", FINAL_SI_TEXT);
+      setTimeout(() => {
+        current = 0;
+        render();
+      }, DECISION_DELAY);
+      return;
+    }
+
     feedback.textContent = "Caaaaaasiii, pa'la primera, mi chica 😛.";
     feedback.className = "feedback wrong-text";
     setTimeout(() => {
       current = 0;
       render();
-    }, 900);
+    }, DECISION_DELAY);
   }
+}
+
+function renderFinalScreen(imageSrc, title, text) {
+  progressBar.style.display = "none";
+  footerHint.style.display = "none";
+  imageFrame.style.display = "block";
+  questionImg.src = imageSrc;
+  questionImg.alt = title;
+
+  card.innerHTML = "";
+  const final = document.createElement("div");
+  final.className = "final-screen";
+  final.innerHTML = `
+    <h1>${title}</h1>
+    <p>${text}</p>
+  `;
+  card.appendChild(final);
 }
 
 function renderDone() {
