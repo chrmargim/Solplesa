@@ -302,9 +302,9 @@ const FINAL_SI_TEXT = " Venga que ya sabes donde vamos pero tienes que ver el fi
 // Uno distinto por cada una de las 19 preguntas (en el mismo orden que el array "questions").
 // Cambia cualquiera de ellos por el que prefieras.
 const WAIT_EMOJIS = [
-  "🐶", "🐱", "🐰", "🦊", "🐻",
+  "🐵", "🐱", "🐰", "🦊", "🐻",
   "🐼", "🐨", "🐯", "🦁", "🐮",
-  "🐷", "🐸", "🐵", "🐔", "🦉",
+  "🐷", "🐸", "🐶", "🐔", "🦉",
   "🦄", "🐴", "🐺", "🐧"
 ];
 
@@ -329,11 +329,6 @@ function createDots(emoji) {
   emojiEl.textContent = emoji || "🐧";
   wrap.appendChild(emojiEl);
 
-  const dots = document.createElement("div");
-  dots.className = "loading-dots";
-  dots.innerHTML = "<span></span><span></span><span></span>";
-  wrap.appendChild(dots);
-
   return wrap;
 }
 
@@ -347,7 +342,7 @@ function renderWelcome() {
   const welcome = document.createElement("div");
   welcome.className = "welcome";
   welcome.innerHTML = `
-    <h1>🎉y¡MUCHAS FELICIDADES MI AMORRRR!❤️</h1>
+    <h1>🎉¡MUCHAS FELICIDADES MI AMORRRR!❤️</h1>
     <p>Juega y diviertete con el cuestionario 😈
 Si fallas vuelves a empezar, piensa bien tus respuestas 👾
 Al completarlo se desvelará el destino 🎆</p>
