@@ -255,7 +255,7 @@ function renderWelcome() {
   const welcome = document.createElement("div");
   welcome.className = "welcome";
   welcome.innerHTML = `
-    <h1>🎉¡MUCHAS FELICIDADES!❤️</h1>
+    <h1>🎉¡MUCHAS FELICIDADES MI AMORRRR!❤️</h1>
     <p>Juega y diviertete con el cuestionario 😈  
     Si fallas vuelves a empezar, piensa bien tus respuestas 👾
     Al completarlo se desvelará el destino 🎆
@@ -330,7 +330,7 @@ function handleAnswer(idx, btn, mark, answersEl, feedback) {
     btn.classList.add("correct");
     mark.textContent = "✓";
     mark.classList.add("show");
-    feedback.textContent = "Correcto.";
+    feedback.textContent = "Mu bien mu bien, pa'la siguiente 😚.";
     feedback.className = "feedback correct-text";
     setTimeout(() => {
       current++;
@@ -340,7 +340,7 @@ function handleAnswer(idx, btn, mark, answersEl, feedback) {
     btn.classList.add("wrong");
     mark.textContent = "✗";
     mark.classList.add("show");
-    feedback.textContent = "Incorrecto. Vuelves a empezar desde la pregunta 1.";
+    feedback.textContent = "Caaaaaasiii, pa'la primera, mi chica 😛.";
     feedback.className = "feedback wrong-text";
     setTimeout(() => {
       current = 0;
